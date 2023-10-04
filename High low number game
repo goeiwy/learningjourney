@@ -1,0 +1,44 @@
+import random
+def random_num():
+    return random.randint(1, 100)
+
+from guessnumber import logo
+
+print(logo)
+
+should_end = False
+random_number = random_num()
+easy_life = 10
+hard_life = 5
+print(f'the answer is {random_number}')
+
+print ('Welcome to the Number Guessing game')
+difficulty = input('Choose a difficulty, Easy or Hard').lower()
+
+if difficulty == 'easy':
+    life = easy_life
+    
+else:
+    life = hard_life
+
+while not should_end:
+        
+    print(f'you have {life} attempts remaining to guess the number')
+    guess = int(input("Make a guess "))    
+
+    if guess == random_number:
+        print(f"You got it!, the number was {random_number}")
+        should_end = True
+    elif guess > random_number:
+        print("too high")
+        life -=1
+    elif guess < random_number:
+        print("too low")
+        life -=1
+    
+    if life == 0:
+        should_end = True
+        print(f"you've run out of life, you lost. The number was {random_number}")
+    
+
+
