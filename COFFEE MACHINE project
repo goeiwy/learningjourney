@@ -42,47 +42,23 @@ quarter = 0.25
 dimes = 0.10
 nickles = 0.05
 pennies = 0.01
-
-water = resources["water"]
-milk = resources["milk"]
-coffee = resources['coffee']
 money = 0
 machine_on = True
+
+
 def report():
-    """ This is to format data and to print balance resources"""
-    print(f"Water: {water}")
-    print(f"Milk: {milk}")
-    print(f"Coffee: {coffee}")
-    print(f"Money: ${money}")
+    """ to print out report of item"""
+    for item in resources:
+        print (f"{item.capitalize()}: {resources[item]}")
+    print (f"Money : ${money}")
 
-def check_latte_cappucino(choice):
-    """This code is to check if ingredient is sufficient"""
-
-    choice_water = MENU[choice]["ingredients"]["water"]
-    choice_coffee = MENU[choice]["ingredients"]["coffee"]
-    choice_milk = MENU[choice]["ingredients"]["milk"]
-
-    if water > choice_water and milk > choice_milk and coffee > choice_coffee:
-        return True
-    elif water < choice_water:
-        return "Sorry there is not enough water"
-    elif milk < choice_milk:
-        return "Sorry there is not enough milk"
-    elif coffee < choice_coffee:
-        return "Sorry there is not enough coffee"
-
-
-def check_espresso(choice):
-
-    choice_water = MENU[choice]["ingredients"]["water"]
-    choice_coffee = MENU[choice]["ingredients"]["coffee"]
-
-    if water > choice_water and coffee > choice_coffee:
-        return True
-    elif water < choice_water:
-        return "Sorry there is not enough water"
-    elif coffee < choice_coffee:
-        return "Sorry there is not enough coffee"
+def check_resource(drink_order):
+    """to check if there is enough resource in the coffee machine"""
+    for item in drink_order:
+        if drink_order[item] > resources[item] :
+            print(f"There is not enough {item}")
+            return False
+    return True
 
 def total():
     """to calculate total coins inserted into machine"""
@@ -95,10 +71,23 @@ def total():
     total_inserted = total_quarter + total_dimes + total_nickles + total_pennies
     return total_inserted
 
-def choice_cost(choice):
-    """to get cost of the chosen coffee"""
-    return MENU[choice]["cost"]
+def check_coins_sufficient(total_inserted, drink_cost):
+    """ to calculate if coins inserted is sufficient"""
+    if total_inserted > drink_cost:
+        global money
+        balance = round(total_inserted - drink_cost, 2)
+        money += drink_cost
+        print(f"Here is your change, ${balance} ")
+        return True
+    else:
+        print("Sorry that's not enough money. Money refunded.")
+        return False
 
+def process_drink_resources(current_resource, drink_resource):
+    """reduce the resources in the machine"""
+    for item in drink_resource:
+        current_resource[item] -= drink_resource[item]
+    print(f'Here is your {choice}')
 
 while machine_on:
     choice = (input("What would you like? (espresso/latte/cappuccino)")).lower()
@@ -108,50 +97,11 @@ while machine_on:
     elif choice == "off":
         machine_on = False
         print("Machine Off")
-    elif choice == "latte" or choice == "cappuccino":
-        check_resource = check_latte_cappucino(choice)
-        if check_resource == True:
+    elif choice == "espresso" or choice == "latte" or choice == "cappuccino":
+        drink = MENU[choice]
+        if check_resource(drink["ingredients"]):
             total_inserted = total()
-            cost = choice_cost(choice)
-            balance = round(total_inserted - cost,2)
-            if balance >= 0 and choice == "latte":
-                money += cost
-                water -= 200
-                milk -= 150
-                coffee -= 24
-                print (f"Here is ${balance} in change.")
-                print (f"Here is your {choice}. Enjoy!")
-            elif balance >= 0 and choice == "cappuccino":
-
-                money += cost
-                water -= 250
-                milk -= 100
-                coffee -= 24
-            else:
-                print("Sorry that's not enough money. Money refunded.")
-
-        else:
-            fail = check_latte_cappucino(choice)
-            print(fail)
-    elif choice == "espresso":
-            check_espresso = check_espresso(choice)
-            if check_espresso == True:
-                total_inserted = total()
-                cost = choice_cost(choice)
-                balance = round(total_inserted - cost, 2)
-                if balance >= 0:
-                    money += cost
-                    water -= 50
-                    coffee -= 18
-                    print(f"Here is ${balance} in change.")
-                    print(f"Here is your {choice}. Enjoy!")
-                else:
-                    print("Sorry that's not enough money. Money refunded.")
-
-            else:
-                fail = check_espresso(choice)
-                print(fail)
+            check_coins_sufficient(total_inserted, drink["cost"])
+            process_drink_resources(resources, drink["ingredients"] )
     else:
-        print ("please re-input")
-
-
+        print("wrong input")
